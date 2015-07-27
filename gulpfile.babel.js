@@ -4,6 +4,7 @@ import path from 'path';
 import minimist from 'minimist';
 import gulp from 'gulp';
 import del from 'del';
+import babelify from 'babelify';
 import browserify from 'browserify';
 import buffer from 'vinyl-buffer';
 import source from 'vinyl-source-stream';
@@ -73,19 +74,11 @@ gulp.task('styles', () => {
 });
 
 
-gulp.task('babel', () => {
-  return gulp.src(['./app/scripts/**/*.js'])
-    .pipe($.sourcemaps.init())
-    .pipe($.babel())
-    .pipe($.sourcemaps.write('.'))
-    .pipe(gulp.dest('.tmp/scripts'));
-});
-
-gulp.task('scripts', ['babel'], () => {
+gulp.task('scripts', () => {
   var b = browserify({
-    entries: ['.tmp/scripts/main.js'],
+    entries: ['app/scripts/main.js'],
     debug: true
-  });
+  }).transform(babelify);
   return b.bundle()
     .on('error', $.util.log.bind($.util, 'Browserify Error'))
     .pipe(source('bundle.js'))
@@ -113,9 +106,9 @@ gulp.task('serve', ['default'], () => {
     baseDir: 'dist'
   });
 
-  gulp.watch(['app/**/*.html'], reload);
+  gulp.watch(['app/**/*.html'], ['html', reload]);
   gulp.watch(['app/styles/**/*.{scss,css}'], ['styles', reload]);
-  gulp.watch(['app/images/**/*'], reload);
+  gulp.watch(['app/images/**/*'], ['copy', reload]);
   gulp.watch(['app/scripts/**/*'], ['scripts', reload]);
 });
 
