@@ -1,8 +1,37 @@
 // import d3 from 'd3';
 // import queue from 'queue-async';
 import Hammer from 'hammerjs';
-console.log(Hammer);
+import domready from 'domready';
 
+domready(() => {
+	let figs = document.querySelectorAll('figure');
+	Array.prototype.forEach.call(figs, (fig) => {
+		let hammer = new Hammer(fig);
+		hammer.on('tap', () => {
+			clone_figure(fig);
+		});
+	});
+});
+
+
+let clone_figure = (figure) => {
+	let playpen = document.querySelector('.playpen');
+	let new_figure = document.createElement('figure');
+	new_figure.classList.add(figure.classList);
+	playpen.appendChild(new_figure);
+	place_figure_at_random(new_figure, playpen);
+};
+
+
+let place_figure_at_random = (figure, playpen) => {
+	let max_width = playpen.clientWidth - figure.clientWidth;
+	let max_height = playpen.clientHeight - figure.clientHeight;
+	let top = Math.round(Math.random() * max_width);
+	let left = Math.round(Math.random() * max_height);
+	console.log(top, left);
+	figure.style.top = top + 'px';
+	figure.style.left = left + 'px';
+};
 
 
 // const IMAGE_IDS = ['1', '2', '3', '4', '5', '6'];

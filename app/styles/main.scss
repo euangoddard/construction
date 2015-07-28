@@ -2,36 +2,61 @@
     box-sizing: border-box;
 }
 
+$stash-size-ratio: 1/6;
+$stash-width: 100vw * $stash-size-ratio;
+$stash-height: 100vh * $stash-size-ratio;
+$playpen-width: 100vw - $stash-width;
+$playpen-height: 100vh - $stash-height;
+
+$figure-size: 100px;
+
 body {
     margin: 0;
     background-color: #333;
     display: flex;
     flex-direction: row;
+    overflow: hidden;
+}
+
+figure {
+    background-size: contain;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+}
+@for $i from 1 through 6 {
+    .image-#{$i} {
+      background-image: url("../images/#{$i}.svg");
+    }
 }
 
 .playpen {
-    flex: 0 0 4;
+    width: $playpen-width;
     height: 100vh;
-    background: red;
+    display: block;
+    position: relative;
+    
+    figure {
+        position: absolute;
+        width: $figure-size;
+        height: $figure-size;
+    }
 }
 .stash {
-    flex: 0 0 1;
+    width: $stash-width;
     height: 100vh;
-    background: blue;
+    display: flex;
     flex-direction: column;
-    justify-content: center;
     
     figure {
         width: 100%;
-        margin: 0;
-        padding: 1rem;
-        
-        img {
-            display: block;
-            width: 100%;
-        }
+        background-size: 80% 80%;
+        height: $stash-height;
     }
 }
+
+
+
 
 @media(orientation: portrait) {
     body {
@@ -39,19 +64,20 @@ body {
     }
     
     .playpen, .stash {
-        height: auto;
         width: 100vw;
     }
     
+    .playpen {
+        height: $playpen-height;
+    }
+    
     .stash {
+        height: $stash-height;
         flex-direction: row;
         
         figure {
-            width: 100vw * 1/6;
-            
-            img {
-                width: 100vw * 1/6;
-            }
+            width: $stash-width;
+            height: $stash-height;
         }
     }
 }
