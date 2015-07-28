@@ -3,36 +3,65 @@
 import Hammer from 'hammerjs';
 import domready from 'domready';
 
+
+const DEGREES_PER_RADIAN = Math.PI / 180;
+
+const ABS_ANGLE_DISPLACEMENT_DEGREES = 20;
+
 domready(() => {
 	let figs = document.querySelectorAll('figure');
+	let vehicles = [];
 	Array.prototype.forEach.call(figs, (fig) => {
 		let hammer = new Hammer(fig);
 		hammer.on('tap', () => {
-			clone_figure(fig);
+			vehicles.push(new Vehicle(fig.classList[0], document.querySelector('.playpen')));
 		});
 	});
+	
+	let move = function () {
+		requestAnimationFrame(move);
+		vehicles.forEach((vehicle) => {
+			vehicle.move();
+		});
+	};
+	move();
 });
 
 
-let clone_figure = (figure) => {
-	let playpen = document.querySelector('.playpen');
-	let new_figure = document.createElement('figure');
-	new_figure.classList.add(figure.classList);
-	playpen.appendChild(new_figure);
-	place_figure_at_random(new_figure, playpen);
-};
-
-
-let place_figure_at_random = (figure, playpen) => {
-	let max_width = playpen.clientWidth - figure.clientWidth;
-	let max_height = playpen.clientHeight - figure.clientHeight;
-	let top = Math.round(Math.random() * max_width);
-	let left = Math.round(Math.random() * max_height);
-	console.log(top, left);
-	figure.style.top = top + 'px';
-	figure.style.left = left + 'px';
-};
-
+class Vehicle {
+	constructor (id, container) {
+		this.id = id;
+		this.container = container;
+		this.element = document.createElement('figure');
+		this.element.classList.add(id);
+		container.appendChild(this.element);
+		this.place_figure_at_random();
+		this.update_ui();
+	}
+	
+	place_figure_at_random () {
+		let max_width = this.container.clientWidth - this.element.clientWidth;
+		let max_height = this.container.clientHeight - this.element.clientHeight;
+		this.top = Math.round(Math.random() * max_width);
+		this.left = Math.round(Math.random() * max_height);
+		let angle_degrees = ABS_ANGLE_DISPLACEMENT_DEGREES - (Math.random() * ABS_ANGLE_DISPLACEMENT_DEGREES * 2);
+		console.log(angle_degrees);
+		this.angle = DEGREES_PER_RADIAN * angle_degrees;
+	}
+	
+	move () {
+		this.left += Math.cos(this.angle);
+		this.top += Math.sin(this.angle);
+		this.update_ui();
+	}
+	
+	update_ui () {
+		this.element.style.top = this.top + 'px';
+		this.element.style.left = this.left + 'px';
+		this.element.style.transform = `rotateZ(${this.angle}rad)`;
+	}
+	
+}
 
 // const IMAGE_IDS = ['1', '2', '3', '4', '5', '6'];
 
